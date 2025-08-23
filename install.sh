@@ -80,7 +80,19 @@ JDziX4jpNyvhVAbEdjbzVfL5oi35l+K/QRtQJnt78qhLpNNB7SdQkNmD8eMeXF7mA/MH6eFM88hF
 4l6NeKklyMIa5thgLFx0UyEgoLXDBg+thUzby61gnA8="
 
 stage1() {
-    echo 
+    echo "********************************************"
+    echo "*                 WARNING!                 *"
+    echo "*                                          *"
+    echo "* This script will replace your Debian     *"
+    echo "* install with Fedora. Please take backups *"
+    echo "* of any important files stored in the     *"
+    echo "* terminal, as they WILL BE erased and the *"
+    echo "* system may stop working at any time.     *"
+    echo "********************************************"
+    read -p "Do you wish to continue? [y/N] " -r answer
+    if [[ ! $answer =~ [yY] ]]; then
+        echo Installation interrupted
+    fi
 
     apt update
     apt install -y jq
@@ -130,6 +142,9 @@ stage1() {
     cp vm_config_new.json "$VM_INSTALL_DIR/vm_config.json"
 
     echo "NEXT_STAGE=2" > installer.state
+
+    echo
+    echo Partition created. Please restart the terminal to make it visible to the system and re-run the script to continue installation.
 }
 
 stage2() {
@@ -168,6 +183,9 @@ stage2() {
     jq '.disks=.disks[:-1]' "$VM_INSTALL_DIR/vm_config.json" > vm_config_new.json
     cp vm_config_new.json "$VM_INSTALL_DIR/vm_config.json"
     mv "$VM_INSTALL_DIR/fedora_root_part" "$VM_INSTALL_DIR/root_part"
+
+    echo
+    echo Installation complete! Restart the terminal to boot into Fedora.
 }
 
 stage3() {
