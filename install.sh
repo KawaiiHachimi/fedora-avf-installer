@@ -145,6 +145,7 @@ stage1() {
 
     echo "NEXT_STAGE=2" > installer.state
 
+    sync
     echo
     echo Partition created. Please restart the terminal to make it visible to the system and re-run the script to continue installation.
 }
