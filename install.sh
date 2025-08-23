@@ -92,6 +92,7 @@ stage1() {
     read -p "Do you wish to continue? [y/N] " -r answer
     if [[ ! $answer =~ [yY] ]]; then
         echo Installation interrupted
+        exit
     fi
 
     apt update
