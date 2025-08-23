@@ -80,6 +80,8 @@ JDziX4jpNyvhVAbEdjbzVfL5oi35l+K/QRtQJnt78qhLpNNB7SdQkNmD8eMeXF7mA/MH6eFM88hF
 4l6NeKklyMIa5thgLFx0UyEgoLXDBg+thUzby61gnA8="
 
 stage1() {
+    echo 
+
     apt update
     apt install -y jq
 
@@ -213,17 +215,12 @@ EOF
 
 stage4() {
     # use dhcp on all ethernet network interfaces
-    # based on /usr/lib/systemd/network/89-ethernet.network.example but with LLMNR disabled
-    cat > /etc/systemd/network/89-ethernet.network <<EOF
-[Match]
-Kind=!*
-Type=ether
-
-[Network]
-DHCP=yes
+    ln -s /usr/lib/systemd/network/89-ethernet.network.example /etc/systemd/network/89-ethernet.network
+    # disable LLMNR globally
+    cat > /etc/systemd/resolved.conf <<EOF
+[Resolve]
 LLMNR=no
 EOF
-
     # upstream resolv.conf mode is used by the default debian image
     ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
     # debian image defaults to UTC
