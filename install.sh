@@ -2,19 +2,19 @@
 set -euo pipefail
 
 error() {
-    echo ERROR: $@
+    echo ERROR: "$@"
     exit 1
 }
 
 exec_with_status() {
     set +e
-    $@
+    "$@"
     status=$?
     set -e
 }
 
 download() {
-    echo Downloading $1
+    echo Downloading "$1"
     curl -fL "$DOWNLOAD_BASE/$1" -o "$1"
     echo
 }
@@ -23,7 +23,7 @@ mkdir_if_needed() {
     if [[ ! -d "$1" ]]; then mkdir "$1"; fi
 }
 
-if [[ $(id -u) != 0 ]]; then
+if [[ $UID != 0 ]]; then
     error This script must be run as root!
 fi
 
@@ -114,7 +114,7 @@ stage1() {
     cd "$WORKING_DIRECTORY"
 
     echo Creating a fedora partition...
-    fallocate -l 2G $VM_INSTALL_DIR/fedora_root_part
+    fallocate -l 2G "$VM_INSTALL_DIR/fedora_root_part"
     jq '.disks+=[{
         "partitions": [
             {
@@ -124,8 +124,8 @@ stage1() {
             }
         ],
         "writable": true
-    }]' $VM_INSTALL_DIR/vm_config.json > vm_config_new.json
-    cp vm_config_new.json $VM_INSTALL_DIR/vm_config.json
+    }]' "$VM_INSTALL_DIR/vm_config.json" > vm_config_new.json
+    cp vm_config_new.json "$VM_INSTALL_DIR/vm_config.json"
 
     echo "NEXT_STAGE=2" > installer.state
 }
@@ -147,7 +147,7 @@ stage2() {
     chroot "$ROOTFS_EXTRACT_DIRECTORY" /tmp/install.sh 3
 
     echo Copying files from debian image...
-    for path in ${PRESERVED_PATHS[@]}; do
+    for path in "${PRESERVED_PATHS[@]}"; do
         parent=$(dirname "$path")
         mkdir -p "$ROOTFS_EXTRACT_DIRECTORY/mnt/install/$parent"
         cp -a "$path" "$ROOTFS_EXTRACT_DIRECTORY/mnt/install/$path"
@@ -269,13 +269,15 @@ EOF
 
 mkdir_if_needed "$WORKING_DIRECTORY"
 if [[ -f "$WORKING_DIRECTORY/installer.state" ]]; then
+    # state file is written by the script itself and cannot be checked here
+    # shellcheck disable=SC1091
     . "$WORKING_DIRECTORY/installer.state"
 fi
 
-: ${NEXT_STAGE:=1}
+: "${NEXT_STAGE:=1}"
 stage=${1:-$NEXT_STAGE}
 
-echo Starting stage $stage
+echo Starting stage "$stage"
 case $stage in
     1)
         stage1
@@ -290,7 +292,7 @@ case $stage in
         stage4
         ;;
     *)
-        error Invalid stage $stage
+        error Invalid stage "$stage"
         ;;
 esac
 
