@@ -54,6 +54,7 @@ PRESERVED_PATHS=(
     /usr/lib/systemd/system/shutdown-runner.service
     /usr/lib/systemd/system/storage-balloon-agent.service
     /usr/local/bin/.
+    /usr/sbin/tcpstates-bpfcc # couldn't find a fedora package providing this
 )
 
 FEDORA_42_KEY=\
@@ -200,7 +201,7 @@ stage3() {
 
     echo Installing system...
     dnf group install --installroot=/mnt/install --use-host-config --assumeyes --exclude=dhcp-client,openssh-server,parted,NetworkManager,dracut-config-rescue,fwupd,plymouth core
-    dnf install --installroot=/mnt/install --use-host-config --assumeyes avahi avahi-tools glibc-all-langpacks libdnf5-plugin-actions \
+    dnf install --installroot=/mnt/install --use-host-config --assumeyes avahi avahi-tools glibc-all-langpacks libdnf5-plugin-actions bcc \
         acl attr bash-color-prompt bzip2 chrony file gnupg2 lsof man-pages pciutils systemd-oomd-defaults tree tar unzip usbutils which zip
 
     cd /mnt/install
