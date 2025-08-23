@@ -96,6 +96,8 @@ stage1() {
         exit
     fi
 
+    chmod +x "$SCRIPT_PATH"
+
     apt update
     apt install -y jq
 
