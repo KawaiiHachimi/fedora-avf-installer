@@ -32,11 +32,9 @@ SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 WORKING_DIRECTORY="$SCRIPT_DIR/installer-data"
 ROOTFS_EXTRACT_DIRECTORY="$WORKING_DIRECTORY/container-rootfs"
 VM_INSTALL_DIR="/mnt/internal/linux"
-DOWNLOAD_BASE="https://download.fedoraproject.org/pub/fedora/linux/releases/42/Container/aarch64/images"
-#DOWNLOAD_BASE="http://10.0.2.2:8000"
-CONTAINER_IMAGE="Fedora-Container-Base-Generic-42-1.1.aarch64.oci.tar.xz"
-CHECKSUM_FILE="Fedora-Container-42-1.1-aarch64-CHECKSUM"
-ROOTFS_BLOB_HASH="cfc0be9fb5518ec8eb4521cdb4dc2ee14df42924e0f468d24a8e6cfbdda5fdc9"
+DOWNLOAD_BASE="https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/aarch64/images"
+CONTAINER_IMAGE="Fedora-Container-Base-Generic-44-1.7.aarch64.oci.tar.xz"
+CHECKSUM_FILE="Fedora-Container-44-1.7-aarch64-CHECKSUM"
 # directories need a . at the end for cp to copy the contents instead of the directory itself
 PRESERVED_PATHS=(
     /etc/fstab
@@ -56,29 +54,6 @@ PRESERVED_PATHS=(
     /usr/local/bin/.
     /usr/sbin/tcpstates-bpfcc # couldn't find a fedora package providing this
 )
-
-FEDORA_42_KEY=\
-"mQINBGXKg9EBEACvsAjRcllcH6mVReU/0hi5YnwqulP7gNgUM4jYPiqucF51g0oWMbFk0VjDn3QX
-jrwLNLtj4oxsU+E6OW0jl1732qvjUJ9geEZBuidyFZgq0CCn9K8d661dPDjN/DzWWogFhnDySFHR
-Ldh6dYCuu75/HKSIVfCud2IFCvT7Bhk4AOpxv4c7mmX874LFgi49jkAYC0M6UbJ9o3KSCndipf/k
-0ra2g9dGacqlPfn3PMiTszPDr99do4qZ5dVZYC6Sna8GjNhN7b/2xLGQuzdd9LHgPHC/PX7XsvBL
-u42rqi3q0umJBtjZCyFxF5Dp0VMwmVfrKFZOHvVsGjPLrxomLU16/EDzIrw6cHikdQKLf4sl0rX0
-m8j0PNAGOSDmE9YgByiPo12CGMOuAvsDUI0JID4p4WqpBShTBuiIrITn8XVTCOQ+tKq9dE/qI+mm
-2hnZjJajM2UWfKE0mVH4SDOiSilgKR/h5HuLZqwtYXFExDZsAcxaLfRBKCrIOyJdpV7YIj8PaP89
-XeycHM2MaIfwdHSx3Pz39zZNzi6vJkLj9SWdQT7lOvZxxTQ3dK0Rcpjx+rGHgihMT4yBd+JO9mZS
-3ghNGbypYnNn/mohPOAxguXuPuPRj00oC7C3lIEEL/hZXZbN1SuiopZjxbU/x/5lO8n0Un1GCzyn
-ObPDvpDLTjsdKQARAQABtDFGZWRvcmEgKDQyKSA8ZmVkb3JhLTQyLXByaW1hcnlAZmVkb3JhcHJv
-amVjdC5vcmc+iQJOBBMBCAA4FiEEsPSVBFj2nhFQxsXtyKxJFhBe+UQFAmXKg9ECGw8FCwkIBwIG
-FQoJCAsCBBYCAwECHgECF4AACgkQyKxJFhBe+US4mQ//e4gIGhA6TJuEqrVPgKtSnDawIj30TGbk
-XIywECtKCu9N8anTlkU2/XSKGyE3ZDdKDO77O11382Ci1xJgCpdbqKg4G02ecEKT1Dtng37gt55S
-khffQ0EeDb3Zl+Pu5qohHQUiMzio4B4q8n0HD+L9klQ3I1rLmymguBRd34jQH/z025GE2SBbCpDn
-QCChZT7Fq1D/onOQgC6skN6QE2dvYqOnSlHkkfuVlRRYoLNmynxHKlL6VZkiM7m1zKi7cMEK63mK
-JQ3jH3Mc9grh+OwBDxOjx5UoYMeYqq7oXyTPKvvf6ssuHtjWM3tNkyi5R1nB+4SHMttrbt2pLMSH
-Jg6pNXoLAP8ahlvxdgVRjgN/6OMC/DwXnLxippelBXXDyBnwVd8/WohbJDcq7e5tdymZpRsNxzhW
-SuwbHzeJY1DKtePhbjblShLjxTzLnS4GBPJV5TXpHkZWgQmz2aA0CHV47j37P6kAOEtsJkJUWWz+
-/Rx1N5Mm5lxvghaAzlTBtwQhRgl9Y8kCTznG40QQ64N2FOrcExUJmujLRISDjM2Ps9MtBlbYs7H4
-JDziX4jpNyvhVAbEdjbzVfL5oi35l+K/QRtQJnt78qhLpNNB7SdQkNmD8eMeXF7mA/MH6eFM88hF
-4l6NeKklyMIa5thgLFx0UyEgoLXDBg+thUzby61gnA8="
 
 stage1() {
     echo "********************************************"
@@ -107,8 +82,8 @@ stage1() {
     download "$CONTAINER_IMAGE"
     download "$CHECKSUM_FILE"
 
-    base64 -d <<< "$FEDORA_42_KEY" > fedora42.keyring
-    exec_with_status gpgv --keyring ./fedora42.keyring "$CHECKSUM_FILE"
+    curl -fL https://fedoraproject.org/fedora.gpg -o fedora.gpg
+    exec_with_status gpgv --keyring ./fedora.gpg "$CHECKSUM_FILE"
 
     if [[ $status != 0 ]]; then
         error Image signature verification failed
@@ -122,6 +97,16 @@ stage1() {
     fi
 
     echo Extracting fedora rootfs...
+    MANIFEST_BLOB_HASH="$(
+        tar xJf "$CONTAINER_IMAGE" index.json -O |
+            jq -r '.manifests[0].digest | sub("^sha256:"; "")'
+    )"
+
+    ROOTFS_BLOB_HASH="$(
+        tar xJf "$CONTAINER_IMAGE" "blobs/sha256/$MANIFEST_BLOB_HASH" -O |
+            jq -r '.layers[0].digest | sub("^sha256:"; "")'
+    )"
+
     tar xJf "$CONTAINER_IMAGE" "blobs/sha256/$ROOTFS_BLOB_HASH" -O > rootfs.tar.gz
     rm "$CONTAINER_IMAGE"
 

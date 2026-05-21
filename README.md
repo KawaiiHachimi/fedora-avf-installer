@@ -4,7 +4,7 @@ fedora-avf-installer replaces the default Debian image shipped with Android's Te
 ## Usage
 Download the script and run it to perform the installation.
 ```sh
-curl -L https://raw.githubusercontent.com/cillyvms/fedora-avf-installer/refs/heads/main/install.sh -o install.sh
+curl -L https://raw.githubusercontent.com/KawaiiHachimi/fedora-avf-installer/refs/heads/main/install.sh -o install.sh
 sudo bash install.sh
 ```
 Installation will take a few minutes and will require a restart of the terminal app.
